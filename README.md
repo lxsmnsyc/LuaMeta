@@ -1,2 +1,259 @@
 # LuaMeta
 A collection of metaprogramming examples for Lua
+
+# Class
+Generic class from OOP languages.
+## How to use
+### Declaration
+Declaring an empty class. 
+
+Take note that classes are declared globally. Classes fail to declare if there is already a global variable that occupies the name.
+
+```lua
+class "test"
+```
+### Constructors
+You know what a constructor is.
+LuaMeta constructors occupies the first parameter for the created object instance.
+The difference of constructors with static and object methods is that they accept functions not table of functions.
+
+```lua
+class "test"
+    : constructor (function (self, intro)
+        self.intro = intro
+    )
+
+local example = test("hello, this is an intro")
+print(example.intro)
+```
+
+You can declare multiple constructors, but they do not redeclare it, they act as one when the constructor is called. But, be careful, if you happen to declare multiple constructors, they should have similar parameters.
+```lua
+class "test"
+    : constructor (function (self, intro, closure)
+        self.intro = intro
+    end)
+    : constructor (function (self, intro, closure)
+        self.closure = closure
+    end)
+
+local example = test("this is an intro", "this is a closure")
+print(example.intro)
+print(example.closure)
+```
+### Static methods
+Static methods are methods that do not require object instances.
+```lua
+class "test"
+    : static {
+        say = function (...)
+            print(...)
+        end
+    }
+
+-- access the static method
+test.say("hello world") -- prints "hello world" 
+```
+Multiple static methods are simply declaring multiple keyed functions inside a table.
+```lua
+class "test"
+    : static {
+        say = function (...)
+            print(...)
+        end,
+        add = function (a, b)
+            return a + b
+        end
+    }
+
+    --you can also do this, for the convenience of grouping methods
+    : static {
+        sub = function (a, b)
+            return a - b
+        end
+    }
+```
+
+
+### Object methods
+Object methods, unlike statics, require object instances.
+In LuaMeta, each "method"'s first parameter is occupied for the object instance
+```lua
+class "test"
+    : method {
+        setMessage = function (self, msg)
+            self.msg = msg
+        end
+    }
+
+local example = test()
+example:setMessage("this is a test")
+print(example.msg) -- prints "this is a test"
+```
+
+Multiple object methods 
+```lua
+class "test"
+    : method {
+        setMessage = function (self, msg)
+            self.msg = msg
+        end,
+        repeatMessage = function (self, n)
+            self.msg = string.rep(self.msg, n)
+        end
+    }
+    -- same with statics
+    : method {
+        empty = function (self)
+            self.msg = ""
+        end
+    }
+```
+### Metamethods
+To declare a metamethod
+```lua
+class "test"
+    : meta {
+        __tostring = function (a)
+            return "hohoho "..a
+        end
+    }
+```
+You cannot redeclare the metamethods "__newindex" and "__index".
+
+Here is an example of a super-mini vector class
+```lua
+class "vector"
+    : constructor(function (self, x, y)
+        self.x = x
+        self.y = y
+    end)
+    : static {
+        __add = function (a, b)
+            return vector(a.x + b.x, a.y + b.y)
+        end,
+        __eq = function (a, b)
+            return a.x == b.x and a.y == b.y 
+        end,
+        __tostring = function (a)
+            return "vector("..a.x..", "..a.y..")"
+        end
+    }
+
+local vectorA = vector(1, 1)
+local vectorB = vector(2, 2)
+print(vectorA + vectorB)
+print(vectorA == vectorB)
+```
+
+# Traits
+Traits are structures that can implemented on classes. They are, somewhat, pieces of an empty class that can be appended to other classes.
+
+## How to use
+### Declaration
+Similar behavior with the classes, they are declared globally.
+
+```lua
+trait "exampleTrait"
+```
+
+### Methods
+Similar to how you declare static methods and object methods in classes
+
+```lua
+trait "exampleTrait"
+    : static {
+        say = function (msg)
+            print(msg)
+        end
+    }
+    : method {
+        setMessage = function (self, msg)
+            self.msg = msg
+        end
+    }
+```
+
+### Implementation
+To implement a trait into a class:
+``` lua
+trait "exampleTrait"
+    : static {
+        say = function (msg)
+            print(msg)
+        end
+    }
+    : method {
+        setMessage = function (self, msg)
+            self.msg = msg
+        end,
+        say = function (self)
+            print(self.msg)
+        end
+    }
+
+class "test"
+    : implements "exampleTrait"
+
+local example = test()
+test.say()
+example:setMessage("hello")
+example:say()
+```
+
+Traits can also implement other traits!
+```lua
+
+trait "exampleTraitStatic"
+    : static {
+        say = function (...)
+            print(...)
+        end
+    }
+
+trait "exampleTraitMethod"
+    : method {
+        say = function (self)
+            print(self.intro .. " " .. self.msg)
+        end,
+        setMessage = function (self, msg)
+            self.msg = msg
+        end
+    }
+
+trait "exampleTrait"
+    : implements "exampleTraitStatic"
+    : implements "exampleTraitMethod"
+
+class "test" 
+    : constructor (function (self, intro)
+        self.msg = "default string"
+        self.intro = intro
+    end)
+    : implements "exampleTrait"
+    : method {
+        repeatMessage = function (self, n)
+            self.msg = string.rep(self.msg, n)
+        end
+    }
+    : meta {
+        __tostring = function (self)
+            return self.msg
+        end
+    }
+
+local a = test("Hello, the message is")
+test.say("this is a test")
+a:say()
+a:setMessage("hello world")
+a:say()
+a:repeatMessage(2)
+a:say()
+```
+
+# Future Meta
+These features will be added soon:
+- Packages/Namespaces
+- Switch
+
+and others. I will be looking for other structures from other languages and try to implement them here!
