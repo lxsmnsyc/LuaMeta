@@ -129,7 +129,7 @@ class "vector"
         self.x = x
         self.y = y
     end)
-    : static {
+    : meta {
         __add = function (a, b)
             return vector(a.x + b.x, a.y + b.y)
         end,

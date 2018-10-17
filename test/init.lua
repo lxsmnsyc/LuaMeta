@@ -1,25 +1,44 @@
 local trait = require "luameta.src.trait"
 local class = require "luameta.src.class"
 
-class "vector"
-    : constructor(function (self, x, y)
-        self.x = x
-        self.y = y
-    end)
-    : meta {
-        __add = function (a, b)
-            return vector(a.x + b.x, a.y + b.y)
-        end,
-        __eq = function (a, b)
-            return a.x == b.x and a.y == b.y 
-        end,
-        __tostring = function (a)
-            return "vector("..a.x..", "..a.y..")"
+trait "exampleTraitStatic"
+    : static {
+        say = function (...)
+            print(...)
         end
     }
 
-local vectorA = vector(1, 1)
-local vectorB = vector(2, 2)
-print(vectorA + vectorB)
-print(vectorA == vectorB)
+trait "exampleTraitMethod"
+    : method {
+        say = function (self)
+            print(self.intro .. " " .. self.msg)
+        end,
+        setMessage = function (self, msg)
+            self.msg = msg
+        end
+    }
+
+trait "exampleTrait"
+    : implements "exampleTraitStatic"
+    : implements "exampleTraitMethod"
+
+class "test" 
+    : constructor (function (self, intro)
+        self.msg = "default string"
+        self.intro = intro
+    end)
+    : implements "exampleTrait"
+    : method {
+        repeatMessage = function (self, n)
+            self.msg = string.rep(self.msg, n)
+        end
+    }
+
+local a = test("Hello, the message is")
+test.say("this is a test")
+a:say()
+a:setMessage("hello world")
+a:say()
+a:repeatMessage(2)
+a:say()
 
