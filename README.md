@@ -10,6 +10,7 @@ Declaring an empty class.
 Take note that classes are declared globally. Classes fail to declare if there is already a global variable that occupies the name.
 
 ```lua
+local class = require "luameta.src.class"
 class "test"
 ```
 ### Constructors
@@ -21,7 +22,7 @@ The difference of constructors with static and object methods is that they accep
 class "test"
     : constructor (function (self, intro)
         self.intro = intro
-    )
+    end)
 
 local example = test("hello, this is an intro")
 print(example.intro)
@@ -154,6 +155,8 @@ Traits are structures that can implemented on classes. They are, somewhat, piece
 Similar behavior with the classes, they are declared globally.
 
 ```lua
+local trait = require "luameta.src.trait"
+
 trait "exampleTrait"
 ```
 
@@ -203,7 +206,6 @@ example:say()
 
 Traits can also implement other traits!
 ```lua
-
 trait "exampleTraitStatic"
     : static {
         say = function (...)
@@ -251,8 +253,23 @@ a:repeatMessage(2)
 a:say()
 ```
 
+# Perks
+Since these meta features are loaded by modules, you can use alternative keywords (that aren't reserved by Lua, obviously)! But not for the member features, of course.
+
+```lua
+local object = require "luameta.src.class"
+
+object "test"
+    : static {
+        say = function (...)
+            print(...)
+        end
+    }
+```
+
 # Future Meta
 These features will be added soon:
+- Class Inheritance and Superclass
 - Packages/Namespaces
 - Switch
 
