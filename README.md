@@ -3,12 +3,27 @@ A collection of metaprogramming examples for Lua
 
 Table of Contents
 =================
-    * [Class](#class)
-    * [Trait](#trait)
-    * [Namespace](#namespace)
-    * [Perks](#perks)
-    * [Future Meta](#future-meta)
-    
+* [Class](#class)
+    * [How to use](#how-to-use)
+        * [Declaration](#declaration)
+        * [Constructors](#constructors)
+        * [Static methods](#static-methods)
+        * [Object methods](#object-methods)
+        * [Metamethods](#metamethods)
+* [Trait](#trait)
+    * [How to use](#how-to-use-1)
+        * [Declaration](#declaration-1)
+        * [Methods](#methods)
+        * [Implementation](#implementation)
+* [Namespace](#namespace)
+    * [How to use](#how-to-use-2)
+        * [Declaration](#declaration-2)
+        * [Classes](#classes)
+        * [Traits](#traits)
+        * [Nested namespaces](#nested-namespaces)
+* [Perks](#perks)
+* [Future Meta](#future-meta)
+
 # Class
 Generic class from OOP languages.
 ## How to use
@@ -21,6 +36,7 @@ Take note that classes are declared globally. Classes fail to declare if there i
 local class = require "luameta.src.class"
 class "test"
 ```
+[Back to top](#luameta)
 ### Constructors
 You know what a constructor is.
 LuaMeta constructors occupies the first parameter for the created object instance.
@@ -50,6 +66,7 @@ local example = test("this is an intro", "this is a closure")
 print(example.intro)
 print(example.closure)
 ```
+[Back to top](#luameta)
 ### Static methods
 Static methods are methods that do not require object instances.
 ```lua
@@ -82,8 +99,7 @@ class "test"
         end
     }
 ```
-
-
+[Back to top](#luameta)
 ### Object methods
 Object methods, unlike statics, require object instances.
 In LuaMeta, each "method"'s first parameter is occupied for the object instance
@@ -118,6 +134,7 @@ class "test"
         end
     }
 ```
+[Back to top](#luameta)
 ### Metamethods
 To declare a metamethod
 ```lua
@@ -155,9 +172,11 @@ print(vectorA + vectorB)
 print(vectorA == vectorB)
 ```
 
+[Back to top](#luameta)
 # Traits
 Traits are structures that can be implemented in classes. They are, somewhat, pieces of an empty class that can be appended to other classes.
 
+[Back to top](#luameta)
 ## How to use
 ### Declaration
 Similar behavior with the classes, they are declared globally.
@@ -168,6 +187,7 @@ local trait = require "luameta.src.trait"
 trait "exampleTrait"
 ```
 
+[Back to top](#luameta)
 ### Methods
 Similar to how you declare static methods and object methods in classes
 
@@ -185,6 +205,7 @@ trait "exampleTrait"
     }
 ```
 
+[Back to top](#luameta)
 ### Implementation
 To implement a trait into a class:
 ``` lua
@@ -261,11 +282,15 @@ a:repeatMessage(2)
 a:say()
 ```
 
+[Back to top](#luameta)
 # Namespace
 Namespaces are structures that keeps the other metastructures declared in scopes(I should've named it "scope", but anyways, you can name it whatever you want.). 
+
 Classes, Traits, etc. declared inside Namespaces are not declared in the global spaces. 
+
 If ever, you declared them outside the namespace and decided to put the global reference inside the namespace, they lose their global reference thereafter.
 
+[Back to top](#luameta)
 ## How to use
 ### Declaration
 ```lua
@@ -273,6 +298,7 @@ local namespace = require "luameta.src.namespace"
 
 namespace "example"
 ```
+[Back to top](#luameta)
 ### Classes
 Classes are declared the same way as it is globally
 
@@ -292,6 +318,7 @@ If you want to access it:
 example.test.say("hello, world!")
 ```
 
+[Back to top](#luameta)
 ### Traits
 Same way as normal Traits
 ```lua
@@ -333,6 +360,7 @@ example.test.say("hello, world")    -- "the message is: hello, world"
 test.say("hello", "world")          -- hello     world
 ```
 
+[Back to top](#luameta)
 ### Nested namespaces
 Yep, it is a feature
 
@@ -366,6 +394,7 @@ local b = ex.vector(2, 3)
 print(a + b)    -- vector(3, 5)
 ```
 
+[Back to top](#luameta)
 # Perks
 Since these meta features are loaded by modules, you can use alternative keywords (that aren't reserved by Lua, obviously)! But not for the member features, of course.
 
@@ -380,6 +409,7 @@ object "test"
     }
 ```
 
+[Back to top](#luameta)
 # Future Meta
 These features will be added soon:
 - Class Inheritance and Superclass
@@ -387,3 +417,5 @@ These features will be added soon:
 - Pattern Matching
 
 and others. I will be looking for other structures from other languages and try to implement them here!
+
+[Back to top](#luameta)
