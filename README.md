@@ -1,6 +1,14 @@
 # LuaMeta
 A collection of metaprogramming examples for Lua
 
+Table of Contents
+=================
+    * [Class](#class)
+    * [Trait](#trait)
+    * [Namespace](#namespace)
+    * [Perks](#perks)
+    * [Future Meta](#future-meta)
+    
 # Class
 Generic class from OOP languages.
 ## How to use
