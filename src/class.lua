@@ -1,3 +1,4 @@
+local namespace = require "luameta.src.namespace"
 local trait = require "luameta.src.trait"
 
 local isTrait = trait.is
@@ -16,6 +17,7 @@ local function newClass(this, name)
 
     local new = {}
 
+    new.name = name
     new.class = c 
     new.metatable = cmt 
 
@@ -93,10 +95,26 @@ local function meta(self, t)
     return self
 end
 
-local function implements(self, t)
-    if(type(t) == "string") then 
-        t = _G[t]
+local function implements(self, name)
+    local t
+    if(type(name) == "string") then 
+        local current = self.namespace
+        if(current) then 
+            t = current[name]
+            while(t == nil) do 
+                current = current.namespace 
+                if(current and isTrait(current[name])) then 
+                    t = current[name]
+                else 
+                    t = _G[name]
+                    break
+                end
+            end 
+        else 
+            t = _G[name]
+        end 
     end
+
 
     if(isTrait(t)) then 
         local c = self.class

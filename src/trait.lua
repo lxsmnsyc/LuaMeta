@@ -1,3 +1,5 @@
+local namespace = require "luameta.src.namespace"
+
 local mt = {}
 
 local function newTrait(this, name)
@@ -22,7 +24,22 @@ end
 local function implements(self, name)
     local t
     if(type(name) == "string" and name ~= self.name) then 
-        t = _G[name]
+        local current = self.namespace
+        if(current) then 
+            t = current[name]
+            while(t == nil) do 
+                current = current.namespace 
+                if(current and getmetatable(current[name]) == mt) then 
+                    t = current[name]
+                else 
+                    t = _G[name]
+                    break
+                end
+            end 
+        else 
+            t = _G[name]
+        end 
+
     elseif(type(name) == "table" and name ~= self) then  
         t = name 
     end 
@@ -88,7 +105,8 @@ mt.__call = newTrait
 mt.__index = {
     implements = implements,
     static = static, 
-    method = method
+    method = method,
+    meta = meta
 }
 
 trait.is = isTrait

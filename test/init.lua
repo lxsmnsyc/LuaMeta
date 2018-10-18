@@ -1,3 +1,4 @@
+local namespace = require "luameta.src.namespace"
 local trait = require "luameta.src.trait"
 local class = require "luameta.src.class"
 

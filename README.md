@@ -148,7 +148,7 @@ print(vectorA == vectorB)
 ```
 
 # Traits
-Traits are structures that can implemented on classes. They are, somewhat, pieces of an empty class that can be appended to other classes.
+Traits are structures that can be implemented in classes. They are, somewhat, pieces of an empty class that can be appended to other classes.
 
 ## How to use
 ### Declaration
@@ -253,6 +253,111 @@ a:repeatMessage(2)
 a:say()
 ```
 
+# Namespace
+Namespaces are structures that keeps the other metastructures declared in scopes(I should've named it "scope", but anyways, you can name it whatever you want.). 
+Classes, Traits, etc. declared inside Namespaces are not declared in the global spaces. 
+If ever, you declared them outside the namespace and decided to put the global reference inside the namespace, they lose their global reference thereafter.
+
+## How to use
+### Declaration
+```lua
+local namespace = require "luameta.src.namespace"
+
+namespace "example"
+```
+### Classes
+Classes are declared the same way as it is globally
+
+```lua
+namespace "example" {
+    class "test" 
+        : static {
+            say = function (...)
+                print(...)
+            end
+        }
+}
+```
+
+If you want to access it:
+```lua
+example.test.say("hello, world!")
+```
+
+### Traits
+Same way as normal Traits
+```lua
+namespace "example" {
+    trait "exampleTrait"
+        : static {
+            say = function (...)
+                print(...)
+            end
+        }
+}
+```
+
+Now, if ever a class declared inside a namespace implements another trait (inside or outside the namespace),it searches for similarly named traits from its namespace siblings.
+```lua
+namespace "example" {
+    trait "exampleTrait" 
+        : static {
+            say = function (msg)
+                print("the message is :", msg)
+            end
+        }
+    ,
+    class "test"
+        : implements "exampleTrait"
+}
+
+trait "exampleTrait"
+    : static {
+        say = function (...)
+            print(...)
+        end 
+    }
+
+class "test"
+    : implements "exampleTrait"
+
+example.test.say("hello, world")    -- "the message is: hello, world"
+test.say("hello", "world")          -- hello     world
+```
+
+### Nested namespaces
+Yep, it is a feature
+
+```lua
+namespace "example2" {
+    trait "vectorMeta"
+        : meta {
+            __add = function (a, b)
+                return example2.example3.vector(a.x + b.x, a.y + b.y)
+            end,
+            __tostring = function (a)
+                return "vector("..a.x..", "..a.y..")"
+            end
+        }
+    ,
+    namespace "example3" {
+        class "vector"
+            : constructor (function (self, x, y)
+                self.x = x 
+                self.y = y
+            end)
+            : implements "vectorMeta"
+    }
+}
+
+local ex = example2.example3
+
+local a = ex.vector(1, 2)
+local b = ex.vector(2, 3)
+
+print(a + b)    -- vector(3, 5)
+```
+
 # Perks
 Since these meta features are loaded by modules, you can use alternative keywords (that aren't reserved by Lua, obviously)! But not for the member features, of course.
 
@@ -270,7 +375,7 @@ object "test"
 # Future Meta
 These features will be added soon:
 - Class Inheritance and Superclass
-- Packages/Namespaces
 - Switch
+- Pattern Matching
 
 and others. I will be looking for other structures from other languages and try to implement them here!
