@@ -24,22 +24,17 @@ end
 local function implements(self, name)
     local t
     if(type(name) == "string" and name ~= self.name) then 
-        local current = self.namespace
-        if(current) then 
-            t = current[name]
-            while(t == nil) do 
-                current = current.namespace 
-                if(current and getmetatable(current[name]) == mt) then 
-                    t = current[name]
-                else 
-                    t = _G[name]
-                    break
-                end
-            end 
-        else 
-            t = _G[name]
-        end 
+        local current = self
 
+        while(not getmetatable(current[name]) == mt) do 
+            current = current.namespace 
+            if(current) then 
+                t = current[name]
+            else 
+                t = _G[name]
+                break
+            end
+        end 
     elseif(type(name) == "table" and name ~= self) then  
         t = name 
     end 

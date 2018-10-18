@@ -1,5 +1,26 @@
 local mt = {}
 
+local function include(self, t)
+    if(type(t) == "table") then 
+        for k, v in pairs(t) do
+            if(type(v) == "table" and type(k) == "number" and v.name ~= "name") then 
+                if(v.class) then 
+                    self[v.name] = v.class
+                else 
+                    self[v.name] = v 
+                end
+                _G[v.name] = nil
+
+
+                v.namespace = self
+            elseif (k ~= "name") then
+                self[k] = v
+            end 
+        end 
+    end 
+    return self 
+end 
+
 local function newNamespace(this, name)
     assert(not _G[name], "")
     assert(type(name) == "string")
@@ -13,39 +34,8 @@ local function newNamespace(this, name)
     _G[name] = new
 
     return function (t)
-        if(type(t) == "table") then 
-            for k, v in pairs(t) do
-                if(type(v) == "table" and type(k) == "number" and v.name ~= "name") then 
-                    if(v.class) then 
-                        new[v.name] = v.class
-                    else 
-                        new[v.name] = v 
-                    end
-                    _G[v.name] = nil
-
-
-                    v.namespace = new
-                elseif (k ~= "name") then
-                    new[k] = v
-                end 
-            end 
-        end 
-        return new 
+        return include(new, t)
     end 
-end 
-
-local function include(self, t)
-    if(type(t) == "table") then
-        for k, v in pairs(t) do
-            if(type(v) == "table" and type(k) ~= "number" and v.name ~= "name") then 
-                self[v.name] = v
-                _G[v.name] = nil
-            elseif (k ~= "name") then
-                self[k] = v
-            end 
-        end 
-    end 
-    return self 
 end 
 
 local namespace = {}

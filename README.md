@@ -10,6 +10,7 @@ Table of Contents
         * [Static methods](#static-methods)
         * [Object methods](#object-methods)
         * [Metamethods](#metamethods)
+        * [Inheritance](#inheritance)
 * [Trait](#trait)
     * [How to use](#how-to-use-1)
         * [Declaration](#declaration-1)
@@ -21,6 +22,7 @@ Table of Contents
         * [Classes](#classes)
         * [Traits](#traits)
         * [Nested namespaces](#nested-namespaces)
+        * [Include](#include)
 * [Perks](#perks)
 * [Future Meta](#future-meta)
 
@@ -171,6 +173,98 @@ local vectorB = vector(2, 2)
 print(vectorA + vectorB)
 print(vectorA == vectorB)
 ```
+
+[Back to top](#luameta)
+
+### Inheritance
+To perform class inheritance:
+```lua
+class "child" : extends "parent"
+```
+A class can only inherit a parent once.
+```lua
+
+class "test"
+    : static {
+        say = function (msg)
+            print(msg)
+        end 
+    }
+    : method {
+        speak = function (self, msg)
+            print(self.intro, msg)
+        end
+    }
+    : constructor ( function (self, intro)
+        self.intro = intro or "hello, the message is"
+    end)
+
+class "test2" : extends "test"
+```
+
+Subclasses can override parent static methods. You can still access original parent method by using the super reference:
+```lua
+class "test2" : extends "test"
+    : static {
+        say = function (msg)
+            print("the message is: ", msg)
+        end
+    }
+
+test2.say("hello")          -- "the message is:     hello"
+
+test2.super.say("hello")    -- "hello"
+```
+
+Child class instances can also access the original parent object method by creating a super instance of itself.
+```lua
+class "vec2"
+    : constructor (function (self, x, y)
+        self.x = x or 0
+        self.y = y or 0
+    end)
+    : meta {
+        __tostring = function (self)
+            return "vec2("..self.x..", "..self.y..")"
+        end
+    }
+
+class "vec3" : extends "vec2"
+    : constructor (function (self, x, y, z)
+        self.z = z or 0
+    end)
+    : meta {
+        __tostring = function (self)
+            return "vec3("..self.x..", "..self.y..", "..self.z..")"
+        end
+    }
+
+class "vec4" : extends "vec3"
+    : constructor (function (self, x, y, z, w)
+        self.w = w or 0
+    end)
+    : meta {
+        __tostring = function (self)
+            return "vec4("..self.x..", "..self.y..", "..self.z..", "..self.w..")"
+        end
+    }
+
+local a = vec2(1, 2)
+local b = vec3(1, 2, 3)
+local c = vec4(1, 2, 3, 4)
+
+print(a)                    -- vec2(1, 2)
+print(b)                    -- vec3(1, 2, 3)
+print(c)                    -- vec4(1, 2, 3, 4)
+print(b:super())            -- vec2(1, 2)
+print(c:super())            -- vec3(1, 2, 3)
+print(c:super():super())    -- vec4(1, 2, 3, 4)
+```
+Take note that using :super() will create a separate instance. It is not actually a class cast, it is more of a super class clone of the child instance. 
+
+Every :super() call is a different instance. 
+
+Modifying :super() instances will not modify the child instance.
 
 [Back to top](#luameta)
 # Traits
@@ -395,6 +489,59 @@ print(a + b)    -- vector(3, 5)
 ```
 
 [Back to top](#luameta)
+### Include
+In case you want to separate your code for namespaces, you can use include
+```lua 
+namespace "example2" {
+    trait "vectorMeta"
+        : meta {
+            __add = function (a, b)
+                return example2.example3.vector(a.x + b.x, a.y + b.y)
+            end,
+            __tostring = function (a)
+                return "vector("..a.x..", "..a.y..")"
+            end
+        }
+    ,
+    namespace "example3" {
+        class "vector"
+            : constructor (function (self, x, y)
+                self.x = x 
+                self.y = y
+            end)
+            : implements "vectorMeta"
+    }
+} : include {
+    namespace "example4" {
+        class "vec3"
+            : constructor (function (self, x, y, z)
+                self.x = x
+                self.y = y
+                self.z = z
+            end)
+    }
+}
+```
+
+Take note that trait implementations will not work if they are separated by include and if string is the argument provided for "implements", since the namespace for the trait is yet unknown during runtime, the workaround is to use the global reference rather than using strings.
+
+```lua
+namespace "example" {
+    trait "staticSay"
+        : static {
+            say = function (...)
+                print(...)
+            end
+        }
+} : include {
+    class "test" 
+        : implements (example.staticSay)
+}
+
+example.test.say("hello", "world")
+```
+
+[Back to top](#luameta)
 # Perks
 Since these meta features are loaded by modules, you can use alternative keywords (that aren't reserved by Lua, obviously)! But not for the member features, of course.
 
@@ -412,7 +559,6 @@ object "test"
 [Back to top](#luameta)
 # Future Meta
 These features will be added soon:
-- Class Inheritance and Superclass
 - Switch
 - Pattern Matching
 

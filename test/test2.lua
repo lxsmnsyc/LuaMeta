@@ -10,10 +10,12 @@ namespace "example" {
                 print(...)
             end
         }
-    ,
+} : include {
     class "test" 
-        : implements "staticSay"
+        : implements (example.staticSay)
 }
+
+example.test.say("hello", "world")
 
 namespace "example2" {
     trait "vectorMeta"
@@ -34,13 +36,21 @@ namespace "example2" {
             end)
             : implements "vectorMeta"
     }
+} : include {
+    namespace "example4" {
+        class "vec3"
+            : constructor (function (self, x, y, z)
+                self.x = x
+                self.y = y
+                self.z = z
+            end)
+    }
 }
-
-example.test.say("hello", "world")
 
 local ex = example2.example3
 
 local a = ex.vector(1, 2)
 local b = ex.vector(2, 3)
+
 
 print(a + b)
